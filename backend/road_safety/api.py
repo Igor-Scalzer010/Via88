@@ -25,6 +25,7 @@ from road_safety.agents.graph import (
 from road_safety.agents.planner import (
     ModelUnavailableError,
     OpenAIPlanner,
+    OutputTokenLimitError,
     PlannedView,
     Planner,
 )
@@ -396,6 +397,12 @@ def create_app(
                 except Exception as error:
                     if isinstance(error, ModelUnavailableError):
                         code, message = "llm_not_configured", str(error)
+                    elif isinstance(error, OutputTokenLimitError):
+                        code, message = (
+                            "output_token_limit",
+                            "A resposta do modelo atingiu o limite de tokens e ficou incompleta. "
+                            "Simplifique a pergunta e tente novamente.",
+                        )
                     elif isinstance(error, TimeoutError):
                         code, message = (
                             "timeout",

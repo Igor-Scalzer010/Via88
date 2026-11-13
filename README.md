@@ -28,6 +28,43 @@ fica somente no FastAPI. A visão inicial, os filtros e o histórico não exigem
 O frontend usa a API local na porta 8000. Para alterar esse endereço, copie
 `frontend/.env.example` para `frontend/.env.local` e configure `BACKEND_URL` ali.
 
+### Limites por chamada ao modelo
+
+Para os testes, o `.env.example` sugere `gpt-6-luna` e os seguintes controles:
+
+| Variável | Padrão | Efeito |
+| --- | --- | --- |
+| `OPENAI_MAX_OUTPUT_TOKENS` | `4096` | Máximo de tokens gerados, incluindo raciocínio e JSON. |
+| `OPENAI_REASONING_EFFORT` | `low` | Esforço de raciocínio do modelo. |
+| `OPENAI_MAX_RETRIES` | `0` | Nenhuma nova tentativa automática após falha do provedor. |
+| `OPENAI_TIMEOUT_SECONDS` | `60` | Timeout da chamada ao modelo, limitado também pelo tempo da análise. |
+| `RUN_TIMEOUT_SECONDS` | `120` | Tempo máximo de toda a análise, incluindo consultas locais. |
+
+Os tokens devem estar entre 1 e 128.000; tentativas adicionais, entre 0 e 3;
+timeouts devem ser positivos e de até 600 segundos. Esforço aceita `none`, `low`,
+`medium`, `high`, `xhigh` ou `max`, conforme suporte do modelo escolhido.
+Reinicie o backend após editar `.env`.
+
+Cada pergunta faz uma chamada lógica ao modelo. Com `OPENAI_MAX_RETRIES=0`, não há
+repetição automática; aumentar esse valor permite novas tentativas do SDK em falhas
+e pode aumentar o consumo. O plano continua limitado a oito consultas locais aos
+dados. Elas não são chamadas adicionais à OpenAI. Se o modelo atingir o limite de
+tokens, a aplicação informa que a resposta ficou incompleta e preserva o painel
+anterior; não aumenta o limite nem tenta completar o JSON automaticamente.
+
+O backend registra identificador da chamada, modelo, resultado, duração e consumo
+de tokens de entrada, saída, raciocínio e total, quando fornecidos pelo provedor.
+Raciocínio já está incluído na saída e não deve ser somado novamente. Falhas sem
+metadados aparecem como `unavailable`, não como consumo zero. Os logs não incluem
+chave, perguntas ou respostas; para acompanhar localmente, use nível de log `INFO`.
+
+Não há teto financeiro acumulado nem limite adicional de tokens de entrada. Os
+limites existentes de mensagem e histórico continuam valendo, mas o custo varia
+com o contexto, o modelo e as tentativas. Esses controles não reservam os créditos
+da conta. Para conferir preços e consumo da conta, consulte a
+[tabela oficial](https://developers.openai.com/api/docs/pricing) e o
+[painel de uso](https://platform.openai.com/usage).
+
 ### Preparar a base
 
 ```powershell

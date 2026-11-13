@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
 from road_safety.agents.graph import make_widgets
-from road_safety.agents.planner import AnalysisPlan, PlannedView
+from road_safety.agents.planner import AnalysisPlan, OutputTokenLimitError, PlannedView
 from road_safety.api import create_app
 from road_safety.config import Settings
 from road_safety.contracts import AnalysisResponse, Catalog, Dataset, Filters, QuerySpec
@@ -229,6 +229,39 @@ def test_timeout_does_not_commit_and_same_request_can_retry(data_dir: Path) -> N
         retry = question(client, session_id)
         assert retry[-1][0] == "completed", retry
         assert len(client.get(f"/api/sessions/{session_id}").json()["messages"]) == 2
+
+
+@pytest.mark.parametrize(
+    ("error", "code"),
+    [(OutputTokenLimitError("truncated"), "output_token_limit"), (TimeoutError(), "timeout")],
+)
+def test_provider_failure_preserves_previous_analysis(
+    data_dir: Path, error: Exception, code: str
+) -> None:
+    class FailingPlanner(FixturePlanner):
+        async def plan(
+            self, question: str, prior_context: AnalysisContext, filters: Filters, catalog: Catalog
+        ) -> AnalysisPlan:
+            if question == "fail":
+                self.calls += 1
+                raise error
+            return await super().plan(question, prior_context, filters, catalog)
+
+    planner = FailingPlanner()
+    with TestClient(create_app(settings_for(data_dir), planner)) as client:
+        session_id = client.post("/api/sessions").json()["id"]
+        question(client, session_id)
+        baseline = client.get(f"/api/sessions/{session_id}").json()
+        failed = question(client, session_id, "fail", "failure")
+        assert failed[-1][0] == "error"
+        assert failed[-1][1]["code"] == code
+        assert planner.calls == 2
+        assert client.get(f"/api/sessions/{session_id}").json() == baseline
+        if code == "output_token_limit":
+            assert "Simplifique" in failed[-1][1]["message"]
+        retry = question(client, session_id, "ranking", "manual-retry")
+        assert retry[-1][0] == "completed"
+        assert planner.calls == 3
 
 
 def test_empty_data_and_invalid_requests(tmp_path: Path) -> None:
