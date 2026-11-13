@@ -1,0 +1,107 @@
+import {
+  type Dataset,
+  type Response,
+  type Session,
+  type Catalog,
+} from "../src/lib/contracts.generated";
+import { emptyDashboard, emptyFilters } from "../src/lib/dashboard";
+export const dataset: Dataset = {
+  id: "data_test",
+  snapshot_id: "snapshot_test",
+  title: "Ranking de rodovias",
+  columns: [
+    { key: "key", label: "Chave", data_type: "string", format: "text" },
+    { key: "label", label: "Rodovia", data_type: "string", format: "text" },
+    { key: "value", label: "Acidentes", data_type: "number", format: "number" },
+  ],
+  rows: [
+    { key: "BR-101", label: "BR-101", value: 12 },
+    { key: "BR-116", label: "BR-116", value: 8 },
+  ],
+  row_count: 2,
+  query: {
+    operation: "ranking",
+    metric: "accidents",
+    group_by: "road",
+    filters: emptyFilters(),
+    comparison_filters: null,
+    cohort: null,
+    limit: 5,
+    offset: 0,
+    sort: "descending",
+  },
+  evidence: {
+    snapshot_id: "snapshot_test",
+    source: "ANTT — Acidentes em rodovias federais concedidas",
+    source_url: "https://dados.antt.gov.br/dataset/acidentes-rodovias",
+    start_date: "2023-01-01",
+    end_date: "2026-01-01",
+    metric: "accidents",
+    definition: "Contagem de acidentes",
+    matched_rows: 20,
+    resources_with_records: 2,
+    resources_total: 2,
+    coverage: "observed",
+    warnings: [],
+  },
+};
+export const result: Response = {
+  schema_version: "1",
+  session_id: "session_test",
+  request_id: "request_test",
+  run_id: "run_test",
+  analysis_id: "analysis_test",
+  snapshot_id: "snapshot_test",
+  status: "complete",
+  answer: "BR-101 liderou o ranking com 12 acidentes no recorte.",
+  datasets: [dataset],
+  dashboard_actions: [
+    {
+      action: "add",
+      widget: {
+        id: "metric_test",
+        type: "metric",
+        title: "Total de acidentes",
+        dataset_id: dataset.id,
+        description: "Registros no recorte",
+        field: "value",
+        aggregation: "sum",
+      },
+    },
+    {
+      action: "add",
+      widget: {
+        id: "chart_test",
+        type: "bar_chart",
+        title: "Acidentes por rodovia",
+        dataset_id: dataset.id,
+        description: "Ranking por total",
+        x_field: "label",
+        y_field: "value",
+        sort: "descending",
+      },
+    },
+  ],
+  evidence: [dataset.evidence],
+  suggestions: ["Dessas rodovias, quais tiveram mais acidentes com vítimas graves?"],
+};
+export const session: Session = {
+  id: "session_test",
+  title: "Minha investigação",
+  active_filters: emptyFilters(),
+  messages: [],
+  dashboard: emptyDashboard(),
+  datasets: [],
+  latest_analysis: null,
+};
+export const catalog: Catalog = {
+  available: true,
+  snapshot_id: "snapshot_test",
+  min_date: "2023-01-01",
+  max_date: "2025-12-31",
+  total_accidents: 20,
+  resources: 2,
+  filters: { roads: ["BR-101", "BR-116"], ufs: ["ES", "SP"] },
+  warnings: [],
+  coverage: [],
+};
