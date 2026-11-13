@@ -1,0 +1,1280 @@
+{
+  "$defs": {
+    "AnalysisResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1",
+          "default": "1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "session_id": {
+          "title": "Session Id",
+          "type": "string"
+        },
+        "request_id": {
+          "title": "Request Id",
+          "type": "string"
+        },
+        "run_id": {
+          "title": "Run Id",
+          "type": "string"
+        },
+        "analysis_id": {
+          "title": "Analysis Id",
+          "type": "string"
+        },
+        "snapshot_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Snapshot Id"
+        },
+        "status": {
+          "enum": [
+            "complete",
+            "clarification",
+            "insufficient_data"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "answer": {
+          "title": "Answer",
+          "type": "string"
+        },
+        "datasets": {
+          "items": {
+            "$ref": "#/$defs/Dataset"
+          },
+          "title": "Datasets",
+          "type": "array"
+        },
+        "dashboard_actions": {
+          "items": {
+            "$ref": "#/$defs/DashboardAction"
+          },
+          "title": "Dashboard Actions",
+          "type": "array"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "suggestions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Suggestions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "session_id",
+        "request_id",
+        "run_id",
+        "analysis_id",
+        "snapshot_id",
+        "status",
+        "answer"
+      ],
+      "title": "AnalysisResponse",
+      "type": "object"
+    },
+    "Catalog": {
+      "additionalProperties": false,
+      "properties": {
+        "available": {
+          "title": "Available",
+          "type": "boolean"
+        },
+        "snapshot_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Snapshot Id"
+        },
+        "min_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Min Date"
+        },
+        "max_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Date"
+        },
+        "total_accidents": {
+          "default": 0,
+          "title": "Total Accidents",
+          "type": "integer"
+        },
+        "resources": {
+          "default": 0,
+          "title": "Resources",
+          "type": "integer"
+        },
+        "filters": {
+          "additionalProperties": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": "Filters",
+          "type": "object"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        },
+        "coverage": {
+          "items": {
+            "additionalProperties": {
+              "$ref": "#/$defs/Scalar"
+            },
+            "type": "object"
+          },
+          "title": "Coverage",
+          "type": "array"
+        }
+      },
+      "required": [
+        "available"
+      ],
+      "title": "Catalog",
+      "type": "object"
+    },
+    "ChartWidget": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "dataset_id": {
+          "title": "Dataset Id",
+          "type": "string"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "bar_chart",
+            "line_chart",
+            "area_chart",
+            "donut_chart"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "x_field": {
+          "default": "label",
+          "title": "X Field",
+          "type": "string"
+        },
+        "y_field": {
+          "default": "value",
+          "title": "Y Field",
+          "type": "string"
+        },
+        "sort": {
+          "anyOf": [
+            {
+              "enum": [
+                "ascending",
+                "descending"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sort"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "dataset_id",
+        "type"
+      ],
+      "title": "ChartWidget",
+      "type": "object"
+    },
+    "ChatMessage": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "user",
+            "assistant"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "content": {
+          "title": "Content",
+          "type": "string"
+        },
+        "analysis_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Analysis Id"
+        }
+      },
+      "required": [
+        "id",
+        "role",
+        "content"
+      ],
+      "title": "ChatMessage",
+      "type": "object"
+    },
+    "ChatRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "message": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "session_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9_-]+$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "request_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9_-]+$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "filters": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Filters"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "message",
+        "session_id",
+        "request_id"
+      ],
+      "title": "ChatRequest",
+      "type": "object"
+    },
+    "Cohort": {
+      "additionalProperties": false,
+      "properties": {
+        "dimension": {
+          "$ref": "#/$defs/Dimension"
+        },
+        "keys": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "title": "Keys",
+          "type": "array"
+        }
+      },
+      "required": [
+        "dimension",
+        "keys"
+      ],
+      "title": "Cohort",
+      "type": "object"
+    },
+    "Column": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "title": "Key",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "data_type": {
+          "default": "string",
+          "enum": [
+            "string",
+            "number",
+            "date"
+          ],
+          "title": "Data Type",
+          "type": "string"
+        },
+        "format": {
+          "default": "text",
+          "enum": [
+            "text",
+            "number",
+            "percent"
+          ],
+          "title": "Format",
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "label"
+      ],
+      "title": "Column",
+      "type": "object"
+    },
+    "Dashboard": {
+      "additionalProperties": false,
+      "properties": {
+        "widgets": {
+          "items": {
+            "$ref": "#/$defs/Widget"
+          },
+          "title": "Widgets",
+          "type": "array"
+        },
+        "layouts": {
+          "additionalProperties": {
+            "items": {
+              "$ref": "#/$defs/LayoutItem"
+            },
+            "type": "array"
+          },
+          "title": "Layouts",
+          "type": "object"
+        },
+        "pinned_widget_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Pinned Widget Ids",
+          "type": "array"
+        }
+      },
+      "title": "Dashboard",
+      "type": "object"
+    },
+    "DashboardAction": {
+      "discriminator": {
+        "mapping": {
+          "add": "#/$defs/UpsertAction",
+          "remove": "#/$defs/RemoveAction",
+          "update": "#/$defs/UpsertAction"
+        },
+        "propertyName": "action"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/UpsertAction"
+        },
+        {
+          "$ref": "#/$defs/RemoveAction"
+        }
+      ]
+    },
+    "Dataset": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "snapshot_id": {
+          "title": "Snapshot Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "columns": {
+          "items": {
+            "$ref": "#/$defs/Column"
+          },
+          "title": "Columns",
+          "type": "array"
+        },
+        "rows": {
+          "items": {
+            "additionalProperties": {
+              "$ref": "#/$defs/Scalar"
+            },
+            "type": "object"
+          },
+          "title": "Rows",
+          "type": "array"
+        },
+        "row_count": {
+          "title": "Row Count",
+          "type": "integer"
+        },
+        "query": {
+          "$ref": "#/$defs/QuerySpec"
+        },
+        "evidence": {
+          "$ref": "#/$defs/Evidence"
+        }
+      },
+      "required": [
+        "id",
+        "snapshot_id",
+        "title",
+        "columns",
+        "rows",
+        "row_count",
+        "query",
+        "evidence"
+      ],
+      "title": "Dataset",
+      "type": "object"
+    },
+    "Dimension": {
+      "enum": [
+        "road",
+        "road_uf",
+        "segment_10km",
+        "uf",
+        "concession",
+        "accident_type",
+        "direction",
+        "track_type",
+        "month",
+        "year",
+        "weekday",
+        "hour",
+        "vehicle_type"
+      ],
+      "type": "string"
+    },
+    "ErrorEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "run_id": {
+          "title": "Run Id",
+          "type": "string"
+        },
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "code",
+        "message"
+      ],
+      "title": "ErrorEvent",
+      "type": "object"
+    },
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "snapshot_id": {
+          "title": "Snapshot Id",
+          "type": "string"
+        },
+        "source": {
+          "default": "ANTT — Acidentes em rodovias federais concedidas",
+          "title": "Source",
+          "type": "string"
+        },
+        "source_url": {
+          "default": "https://dados.antt.gov.br/dataset/acidentes-rodovias",
+          "title": "Source Url",
+          "type": "string"
+        },
+        "start_date": {
+          "title": "Start Date",
+          "type": "string"
+        },
+        "end_date": {
+          "title": "End Date",
+          "type": "string"
+        },
+        "metric": {
+          "$ref": "#/$defs/Metric"
+        },
+        "definition": {
+          "title": "Definition",
+          "type": "string"
+        },
+        "matched_rows": {
+          "title": "Matched Rows",
+          "type": "integer"
+        },
+        "resources_with_records": {
+          "title": "Resources With Records",
+          "type": "integer"
+        },
+        "resources_total": {
+          "title": "Resources Total",
+          "type": "integer"
+        },
+        "coverage": {
+          "enum": [
+            "observed",
+            "partial",
+            "none"
+          ],
+          "title": "Coverage",
+          "type": "string"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "snapshot_id",
+        "start_date",
+        "end_date",
+        "metric",
+        "definition",
+        "matched_rows",
+        "resources_with_records",
+        "resources_total",
+        "coverage"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "Filters": {
+      "additionalProperties": false,
+      "properties": {
+        "start_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start Date"
+        },
+        "end_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End Date"
+        },
+        "roads": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 50,
+          "title": "Roads",
+          "type": "array"
+        },
+        "ufs": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 27,
+          "title": "Ufs",
+          "type": "array"
+        },
+        "concessions": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 50,
+          "title": "Concessions",
+          "type": "array"
+        },
+        "accident_types": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 50,
+          "title": "Accident Types",
+          "type": "array"
+        },
+        "directions": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 20,
+          "title": "Directions",
+          "type": "array"
+        },
+        "track_types": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 20,
+          "title": "Track Types",
+          "type": "array"
+        },
+        "vehicle_types": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10,
+          "title": "Vehicle Types",
+          "type": "array"
+        },
+        "severity": {
+          "default": "all",
+          "enum": [
+            "all",
+            "with_severe",
+            "with_deaths",
+            "with_injuries"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "km_min": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Km Min"
+        },
+        "km_max": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Km Max"
+        }
+      },
+      "title": "Filters",
+      "type": "object"
+    },
+    "Health": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "const": "ok",
+          "default": "ok",
+          "title": "Status",
+          "type": "string"
+        },
+        "data_available": {
+          "title": "Data Available",
+          "type": "boolean"
+        },
+        "llm_configured": {
+          "title": "Llm Configured",
+          "type": "boolean"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model"
+        }
+      },
+      "required": [
+        "data_available",
+        "llm_configured"
+      ],
+      "title": "Health",
+      "type": "object"
+    },
+    "LayoutItem": {
+      "additionalProperties": false,
+      "properties": {
+        "i": {
+          "title": "I",
+          "type": "string"
+        },
+        "x": {
+          "minimum": 0,
+          "title": "X",
+          "type": "integer"
+        },
+        "y": {
+          "minimum": 0,
+          "title": "Y",
+          "type": "integer"
+        },
+        "w": {
+          "maximum": 12,
+          "minimum": 1,
+          "title": "W",
+          "type": "integer"
+        },
+        "h": {
+          "maximum": 30,
+          "minimum": 1,
+          "title": "H",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "i",
+        "x",
+        "y",
+        "w",
+        "h"
+      ],
+      "title": "LayoutItem",
+      "type": "object"
+    },
+    "MapWidget": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "dataset_id": {
+          "title": "Dataset Id",
+          "type": "string"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "type": {
+          "const": "map_choropleth",
+          "title": "Type",
+          "type": "string"
+        },
+        "x_field": {
+          "default": "key",
+          "title": "X Field",
+          "type": "string"
+        },
+        "y_field": {
+          "default": "value",
+          "title": "Y Field",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "dataset_id",
+        "type"
+      ],
+      "title": "MapWidget",
+      "type": "object"
+    },
+    "Metric": {
+      "enum": [
+        "accidents",
+        "accidents_with_severe",
+        "severe_injuries",
+        "deaths",
+        "injuries"
+      ],
+      "type": "string"
+    },
+    "MetricWidget": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "dataset_id": {
+          "title": "Dataset Id",
+          "type": "string"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "type": {
+          "const": "metric",
+          "title": "Type",
+          "type": "string"
+        },
+        "field": {
+          "default": "value",
+          "title": "Field",
+          "type": "string"
+        },
+        "aggregation": {
+          "default": "sum",
+          "enum": [
+            "sum",
+            "count",
+            "avg"
+          ],
+          "title": "Aggregation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "dataset_id",
+        "type"
+      ],
+      "title": "MetricWidget",
+      "type": "object"
+    },
+    "QuerySpec": {
+      "additionalProperties": false,
+      "properties": {
+        "operation": {
+          "enum": [
+            "ranking",
+            "timeseries",
+            "distribution",
+            "comparison",
+            "detail",
+            "overview"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "metric": {
+          "$ref": "#/$defs/Metric",
+          "default": "accidents"
+        },
+        "group_by": {
+          "$ref": "#/$defs/Dimension",
+          "default": "road_uf"
+        },
+        "filters": {
+          "$ref": "#/$defs/Filters"
+        },
+        "comparison_filters": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Filters"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "cohort": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Cohort"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "limit": {
+          "default": 5,
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Limit",
+          "type": "integer"
+        },
+        "offset": {
+          "default": 0,
+          "maximum": 10000000,
+          "minimum": 0,
+          "title": "Offset",
+          "type": "integer"
+        },
+        "sort": {
+          "default": "descending",
+          "enum": [
+            "ascending",
+            "descending"
+          ],
+          "title": "Sort",
+          "type": "string"
+        }
+      },
+      "required": [
+        "operation"
+      ],
+      "title": "QuerySpec",
+      "type": "object"
+    },
+    "RemoveAction": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "const": "remove",
+          "title": "Action",
+          "type": "string"
+        },
+        "widget_id": {
+          "title": "Widget Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "action",
+        "widget_id"
+      ],
+      "title": "RemoveAction",
+      "type": "object"
+    },
+    "Scalar": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "Session": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "active_filters": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Filters"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "messages": {
+          "items": {
+            "$ref": "#/$defs/ChatMessage"
+          },
+          "title": "Messages",
+          "type": "array"
+        },
+        "dashboard": {
+          "$ref": "#/$defs/Dashboard"
+        },
+        "datasets": {
+          "items": {
+            "$ref": "#/$defs/Dataset"
+          },
+          "title": "Datasets",
+          "type": "array"
+        },
+        "latest_analysis": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AnalysisResponse"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "id",
+        "title"
+      ],
+      "title": "Session",
+      "type": "object"
+    },
+    "SessionSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title"
+      ],
+      "title": "SessionSummary",
+      "type": "object"
+    },
+    "StageEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "run_id": {
+          "title": "Run Id",
+          "type": "string"
+        },
+        "stage": {
+          "title": "Stage",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "stage",
+        "label"
+      ],
+      "title": "StageEvent",
+      "type": "object"
+    },
+    "TableWidget": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "dataset_id": {
+          "title": "Dataset Id",
+          "type": "string"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "type": {
+          "const": "table",
+          "title": "Type",
+          "type": "string"
+        },
+        "columns": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Columns",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "dataset_id",
+        "type"
+      ],
+      "title": "TableWidget",
+      "type": "object"
+    },
+    "UpsertAction": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "enum": [
+            "add",
+            "update"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "widget": {
+          "$ref": "#/$defs/Widget"
+        }
+      },
+      "required": [
+        "action",
+        "widget"
+      ],
+      "title": "UpsertAction",
+      "type": "object"
+    },
+    "Widget": {
+      "discriminator": {
+        "mapping": {
+          "area_chart": "#/$defs/ChartWidget",
+          "bar_chart": "#/$defs/ChartWidget",
+          "donut_chart": "#/$defs/ChartWidget",
+          "line_chart": "#/$defs/ChartWidget",
+          "map_choropleth": "#/$defs/MapWidget",
+          "metric": "#/$defs/MetricWidget",
+          "table": "#/$defs/TableWidget"
+        },
+        "propertyName": "type"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/MetricWidget"
+        },
+        {
+          "$ref": "#/$defs/ChartWidget"
+        },
+        {
+          "$ref": "#/$defs/TableWidget"
+        },
+        {
+          "$ref": "#/$defs/MapWidget"
+        }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "description": "Export root; each property becomes one generated Zod schema.",
+  "properties": {
+    "chat_request": {
+      "$ref": "#/$defs/ChatRequest"
+    },
+    "response": {
+      "$ref": "#/$defs/AnalysisResponse"
+    },
+    "dataset": {
+      "$ref": "#/$defs/Dataset"
+    },
+    "session": {
+      "$ref": "#/$defs/Session"
+    },
+    "session_summary": {
+      "$ref": "#/$defs/SessionSummary"
+    },
+    "catalog": {
+      "$ref": "#/$defs/Catalog"
+    },
+    "dashboard": {
+      "$ref": "#/$defs/Dashboard"
+    },
+    "health": {
+      "$ref": "#/$defs/Health"
+    },
+    "stage": {
+      "$ref": "#/$defs/StageEvent"
+    },
+    "error": {
+      "$ref": "#/$defs/ErrorEvent"
+    }
+  },
+  "required": [
+    "chat_request",
+    "response",
+    "dataset",
+    "session",
+    "session_summary",
+    "catalog",
+    "dashboard",
+    "health",
+    "stage",
+    "error"
+  ],
+  "title": "ContractBundle",
+  "type": "object"
+}
