@@ -5,6 +5,10 @@ Pydantic models in `backend/road_safety/contracts.py` are authoritative.
 `npm run contracts` to generate Zod validators and inferred TypeScript types.
 `npm run contracts:check` fails on drift. Do not edit generated validators.
 
+Generated contracts use LF line endings through `.gitattributes`. The frontend
+check also accepts CRLF from existing Windows checkouts without rewriting files;
+actual schema changes still fail validation.
+
 SSE uses `event: run_started`, `event: stage`, `event: completed`, or `event: error`.
 Each `data:` is a JSON object: StageEvent for start/stage, AnalysisResponse for
 completed, ErrorEvent for error. POST `/api/chat` accepts ChatRequest.
