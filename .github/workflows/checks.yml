@@ -1,0 +1,37 @@
+name: Checks
+
+on: [push, pull_request]
+
+jobs:
+  validate:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install backend
+        run: |
+          python -m venv .venv
+          .\.venv\Scripts\python.exe -m pip install -r requirements.lock
+          .\.venv\Scripts\python.exe -m pip install -e . --no-deps
+      - name: Install frontend
+        working-directory: frontend
+        run: npm ci
+      - name: Validate contracts, code, tests and production build
+        shell: pwsh
+        run: ./scripts/check.ps1
+      - name: Install browser
+        working-directory: frontend
+        run: npx playwright install chromium
+      - name: Browser acceptance
+        working-directory: frontend
+        run: npm run test:e2e
+      - name: Browser integration with FastAPI and LangGraph
+        working-directory: frontend
+        run: npm run test:e2e:integration
