@@ -262,8 +262,7 @@ button {
   color: var(--muted);
   font-size: 11px;
 }
-.source-pill i,
-.live-dot {
+.source-pill i {
   width: 5px;
   height: 5px;
   border-radius: 50%;
@@ -385,16 +384,13 @@ button {
   font-weight: 400;
   color: var(--subtle);
 }
-.section-label > span:last-child {
+.section-label .pinned-count {
   display: flex;
   align-items: center;
   gap: 8px;
   letter-spacing: 0;
   font-size: 10px;
   font-weight: 400;
-}
-.live-dot {
-  margin-left: 9px;
 }
 .dashboard-grid {
   min-height: 400px;
@@ -420,12 +416,6 @@ button {
 }
 .dark .coverage-partial {
   color: #dfbc77;
-}
-.coverage-banner.coverage-partial {
-  background: color-mix(in srgb, #bd913b 10%, var(--card));
-}
-.coverage-banner.coverage-partial svg {
-  color: inherit;
 }
 .footer-badges {
   display: flex;
@@ -572,19 +562,6 @@ button {
 .mobile-chart {
   min-height: 330px;
   grid-column: 1/-1;
-}
-.dashboard-bottom {
-  padding: 24px 1px 20px;
-  color: var(--subtle);
-  display: flex;
-  justify-content: space-between;
-  font-size: 9px;
-  gap: 12px;
-}
-.dashboard-bottom > span {
-  display: flex;
-  align-items: center;
-  gap: 6px;
 }
 .chat-container {
   width: 350px;
@@ -903,22 +880,6 @@ button {
   color: var(--muted);
   display: flex;
   align-items: center;
-}
-.coverage-banner {
-  background: var(--accent-light);
-  color: var(--muted);
-  font-size: 10px;
-  line-height: 1.6;
-  padding: 9px 12px;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  border-radius: 7px;
-  margin-top: 13px;
-}
-.coverage-banner svg {
-  flex-shrink: 0;
-  color: var(--accent);
 }
 .filter-chips {
   display: flex;
@@ -1295,9 +1256,6 @@ button {
     padding-left: 16px;
     padding-right: 16px;
   }
-  .dashboard-bottom > span:last-child {
-    display: none;
-  }
 }
 @media (max-width: 1024px) and (min-width: 761px) {
   .has-chat .mobile-grid {
@@ -1382,7 +1340,7 @@ button {
   .session-select select {
     max-width: 155px;
   }
-  .section-label > span:last-child {
+  .section-label .pinned-count {
     font-size: 9px;
   }
   .section-label i {

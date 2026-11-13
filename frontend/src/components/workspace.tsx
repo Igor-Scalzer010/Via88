@@ -8,8 +8,6 @@ import "react-resizable/css/styles.css";
 import { AnimatePresence, motion, MotionConfig } from "motion/react";
 import {
   Activity,
-  AlertTriangle,
-  ArrowDownToLine,
   ArrowRight,
   CalendarDays,
   ChevronDown,
@@ -345,12 +343,6 @@ export function Workspace() {
   const synthetic = catalog?.warnings.some((warning) => /sint[eé]tic/i.test(warning)) ?? false;
   const pinnedCount = dashboard.pinned_widget_ids.length;
   const widgets = dashboard.widgets;
-  const partialCoverage =
-    view?.datasets.some(
-      (dataset) =>
-        dataset.evidence.coverage === "partial" &&
-        widgets.some((widget) => widget.dataset_id === dataset.id),
-    ) ?? false;
   const layouts = dashboard.layouts.lg ?? [];
   const metricWidgets = widgets.filter((widget) => widget.type === "metric");
   const chartWidgets = widgets.filter((widget) => widget.type !== "metric");
@@ -682,33 +674,15 @@ export function Workspace() {
                 </motion.div>
               )}
             </AnimatePresence>
-            {partialCoverage && (
-              <div className="coverage-banner coverage-partial" role="status">
-                <AlertTriangle size={14} />
-                Cobertura parcial no período: resultados descrevem os registros disponíveis.
-                Consulte as fontes.
-              </div>
-            )}
-            {catalog?.warnings.slice(0, partialCoverage ? 1 : 2).map((warning) => (
-              <div className="coverage-banner" key={warning}>
-                <InfoIcon />
-                {warning}
-              </div>
-            ))}
             <div className="section-label">
               <span>
                 VISÃO GERAL <i>{widgets.length} visualizações</i>
               </span>
-              <span>
-                {pinnedCount > 0 &&
-                  `${pinnedCount} ${pinnedCount === 1 ? "resultado fixado" : "resultados fixados"}`}
-                <span className="live-dot" />
-                {busy
-                  ? "Atualizando análise"
-                  : catalog?.available
-                    ? "Exploração ao vivo"
-                    : "Aguardando dados"}
-              </span>
+              {pinnedCount > 0 && (
+                <span className="pinned-count">
+                  {`${pinnedCount} ${pinnedCount === 1 ? "resultado fixado" : "resultados fixados"}`}
+                </span>
+              )}
             </div>
             <div ref={containerRef} className="dashboard-grid">
               {loading && !widgets.length ? (
@@ -789,15 +763,6 @@ export function Workspace() {
                 </div>
               )}
             </div>
-            <footer className="dashboard-bottom">
-              <span>
-                <Database size={12} />
-                {synthetic
-                  ? "Demonstração · dados sintéticos"
-                  : "Fonte: ANTT · Rodovias federais concedidas"}
-              </span>
-              <span>Investigue com contexto. Decida com evidências.</span>
-            </footer>
           </main>
           {showChat && (
             <div className={`chat-container mobile-${mobileTab}`}>
@@ -836,7 +801,4 @@ export function Workspace() {
       </div>
     </MotionConfig>
   );
-}
-function InfoIcon() {
-  return <ArrowDownToLine size={13} />;
 }
