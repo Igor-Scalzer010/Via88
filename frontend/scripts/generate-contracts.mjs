@@ -63,6 +63,8 @@ output +=
   '\nexport type Widget = Dashboard["widgets"][number];\nexport type Filters = NonNullable<ChatRequest["filters"]>;\n';
 const target = new URL("../src/lib/contracts.generated.ts", import.meta.url);
 if (process.argv.includes("--check")) {
-  if ((await readFile(target, "utf8")) !== output)
+  // Existing Windows checkouts may use CRLF; only contract changes count as drift.
+  const existing = (await readFile(target, "utf8")).replaceAll("\r\n", "\n");
+  if (existing !== output)
     throw new Error("Generated contracts have drifted. Run npm run contracts.");
 } else await writeFile(target, output);
