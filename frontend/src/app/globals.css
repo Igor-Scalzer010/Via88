@@ -616,35 +616,6 @@ button {
   display: flex;
   flex-direction: column;
 }
-.chat-heading {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  gap: 10px;
-  padding: 23px 20px;
-  border-bottom: 1px solid var(--border);
-}
-.chat-symbol {
-  color: var(--accent);
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 9px;
-  background: var(--accent-light);
-}
-.chat-heading h2 {
-  margin: 0 0 4px;
-  font-size: 12px;
-  font-weight: 600;
-}
-.chat-heading span {
-  font-size: 9px;
-  color: var(--muted);
-}
-.chat-heading > .button {
-  margin-left: auto;
-}
 .chat-conversation {
   flex: 1;
   min-height: 0;
@@ -666,7 +637,7 @@ button {
   border-radius: 15px;
   margin-bottom: 21px;
 }
-.chat-welcome h3 {
+.chat-welcome h2 {
   font-size: 25px;
   font-weight: 500;
   line-height: 1.23;
@@ -1462,9 +1433,6 @@ select.filter-control {
   }
   .mobile-tabs button.active {
     color: var(--accent);
-  }
-  .chat-heading {
-    padding: 18px 20px;
   }
   .chat-welcome {
     padding-top: 18px;

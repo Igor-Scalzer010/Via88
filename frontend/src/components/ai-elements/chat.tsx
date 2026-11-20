@@ -1,7 +1,7 @@
 "use client";
 // Presentational AI Elements pattern: backend stages drive Trace, not model reasoning.
 import { useEffect, useRef, useState } from "react";
-import { ArrowUp, Check, ChevronDown, LoaderCircle, Plus, Sparkles, Square } from "lucide-react";
+import { ArrowUp, Check, ChevronDown, LoaderCircle, Sparkles, Square } from "lucide-react";
 import type { Session, Stage } from "@/lib/contracts.generated";
 import { Button } from "@/components/ui/button";
 function MessageText({ content }: { content: string }) {
@@ -28,7 +28,6 @@ export function InvestigationChat({
   suggestions,
   onSubmit,
   onCancel,
-  onNew,
 }: {
   messages: Session["messages"];
   stages: Stage[];
@@ -37,7 +36,6 @@ export function InvestigationChat({
   suggestions: string[];
   onSubmit: (message: string) => void;
   onCancel: () => void;
-  onNew: () => void;
 }) {
   const [prompt, setPrompt] = useState("");
   const bottom = useRef<HTMLDivElement>(null);
@@ -58,24 +56,6 @@ export function InvestigationChat({
   ];
   return (
     <aside className="chat-panel" aria-label="Investigação com assistente">
-      <header className="chat-heading">
-        <div className="chat-symbol">
-          <Sparkles size={18} />
-        </div>
-        <div>
-          <h2>Explore com a Via</h2>
-          <span>Uma pergunta, novas perspectivas</span>
-        </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onNew}
-          disabled={busy}
-          aria-label="Nova investigação"
-        >
-          <Plus size={18} />
-        </Button>
-      </header>
       <div
         className="chat-conversation"
         role="log"
@@ -87,11 +67,11 @@ export function InvestigationChat({
             <span className="welcome-symbol">
               <Sparkles size={25} />
             </span>
-            <h3>
+            <h2>
               Encontre a próxima
               <br />
               pergunta.
-            </h3>
+            </h2>
             <p>Investigue padrões, compare rodovias e aprofunde seus resultados em uma conversa.</p>
             <span className="eyebrow">COMECE POR AQUI</span>
             <div className="suggestions">

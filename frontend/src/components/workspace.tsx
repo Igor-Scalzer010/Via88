@@ -774,7 +774,6 @@ export function Workspace() {
                 suggestions={suggestions}
                 onSubmit={(message) => void send(message)}
                 onCancel={() => abort.current?.abort()}
-                onNew={() => void newSession()}
               />
             </div>
           )}
