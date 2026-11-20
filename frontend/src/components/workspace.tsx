@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { z } from "zod";
 import Link from "next/link";
 import GridLayout, { useContainerWidth } from "react-grid-layout";
@@ -8,8 +8,6 @@ import "react-resizable/css/styles.css";
 import { AnimatePresence, motion, MotionConfig } from "motion/react";
 import {
   Activity,
-  AlertTriangle,
-  ArrowDownToLine,
   ArrowRight,
   CalendarDays,
   ChevronDown,
@@ -17,7 +15,6 @@ import {
   Database,
   LayoutDashboard,
   LockKeyhole,
-  MessageSquare,
   PanelRightClose,
   PanelRightOpen,
   Plus,
@@ -57,6 +54,10 @@ import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 
 type View = { session: Session; dashboard: Dashboard; datasets: Dataset[] };
+const MIN_CHAT_WIDTH = 270;
+const MAX_CHAT_WIDTH = 680;
+const MIN_DASHBOARD_WIDTH = 390;
+
 function fromSession(session: Session): View {
   validateDashboard(session.dashboard, session.datasets);
   return { session, dashboard: session.dashboard, datasets: session.datasets };
@@ -72,14 +73,27 @@ export function Workspace() {
   const [error, setError] = useState("");
   const [stages, setStages] = useState<Stage[]>([]);
   const [showChat, setShowChat] = useState(true);
+  const [preferredChatWidth, setPreferredChatWidth] = useState(350);
+  const [resizingChat, setResizingChat] = useState(false);
   const [mobileTab, setMobileTab] = useState<"dashboard" | "chat">("dashboard");
   const [locked, setLocked] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const { width, containerRef, mounted } = useContainerWidth();
+  const { width: workspaceWidth, containerRef: workspaceRef } = useContainerWidth({
+    initialWidth: 0,
+  });
+  const chatDrag = useRef<{ pointerId: number; x: number; width: number } | null>(null);
   const current = useRef<View | null>(null);
   const abort = useRef<AbortController | null>(null);
   const saveQueue = useRef(Promise.resolve());
   const loadGeneration = useRef(0);
+  const maxChatWidth = workspaceWidth
+    ? Math.max(MIN_CHAT_WIDTH, Math.min(MAX_CHAT_WIDTH, workspaceWidth - MIN_DASHBOARD_WIDTH))
+    : MAX_CHAT_WIDTH;
+  const clampChatWidth = (width: number) => Math.min(maxChatWidth, Math.max(MIN_CHAT_WIDTH, width));
+  const chatWidth = clampChatWidth(preferredChatWidth);
+  const activeMobileTab = showChat ? mobileTab : "dashboard";
+
   function updateView(next: View) {
     current.current = next;
     setView(next);
@@ -345,12 +359,6 @@ export function Workspace() {
   const synthetic = catalog?.warnings.some((warning) => /sint[eé]tic/i.test(warning)) ?? false;
   const pinnedCount = dashboard.pinned_widget_ids.length;
   const widgets = dashboard.widgets;
-  const partialCoverage =
-    view?.datasets.some(
-      (dataset) =>
-        dataset.evidence.coverage === "partial" &&
-        widgets.some((widget) => widget.dataset_id === dataset.id),
-    ) ?? false;
   const layouts = dashboard.layouts.lg ?? [];
   const metricWidgets = widgets.filter((widget) => widget.type === "metric");
   const chartWidgets = widgets.filter((widget) => widget.type !== "metric");
@@ -447,7 +455,7 @@ export function Workspace() {
   }
   return (
     <MotionConfig reducedMotion="user">
-      <div className={`app-shell ${showChat ? "has-chat" : ""}`}>
+      <div className="app-shell">
         <nav className="rail" aria-label="Navegação principal">
           <Link className="brand-symbol" href="/" aria-label="Via início">
             <Route size={25} />
@@ -459,16 +467,6 @@ export function Workspace() {
               onClick={() => setMobileTab("dashboard")}
             >
               <LayoutDashboard size={20} />
-            </button>
-            <button
-              className="rail-button"
-              aria-label="Abrir investigação"
-              onClick={() => {
-                setShowChat(true);
-                setMobileTab("chat");
-              }}
-            >
-              <MessageSquare size={20} />
             </button>
             <Dialog>
               <DialogTrigger asChild>
@@ -547,38 +545,40 @@ export function Workspace() {
             <div className="mobile-theme">
               <ThemeToggle />
             </div>
-            <span className="source-pill">
-              <i />
-              {catalog?.available
-                ? synthetic
-                  ? "Demonstração · dados sintéticos"
-                  : "Dados ANTT"
-                : "Base não importada"}
-            </span>
+            {(!catalog?.available || synthetic) && (
+              <span className="source-pill">
+                <i />
+                {catalog?.available ? "Demonstração · dados sintéticos" : "Base não importada"}
+              </span>
+            )}
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setShowChat(!showChat)}
+              onClick={() => {
+                chatDrag.current = null;
+                setResizingChat(false);
+                setShowChat((open) => !open);
+              }}
               aria-label={showChat ? "Recolher investigação" : "Mostrar investigação"}
+              aria-expanded={showChat}
+              aria-controls={showChat ? "investigation-panel" : undefined}
             >
               {showChat ? <PanelRightClose size={19} /> : <PanelRightOpen size={19} />}
             </Button>
           </div>
         </header>
-        <div className="workspace-body">
-          <main className={`dashboard-main mobile-${mobileTab}`}>
+        <div
+          ref={workspaceRef}
+          className="workspace-body"
+          data-resizing-chat={resizingChat || undefined}
+          style={{ "--chat-width": `${chatWidth}px` } as CSSProperties}
+        >
+          <main className={`dashboard-main mobile-${activeMobileTab}`}>
             <div className="page-heading">
-              <div>
-                <div className="eyebrow">
-                  <span className="tiny-line" />
-                  OBSERVATÓRIO DE SEGURANÇA
-                </div>
-                <h1>
-                  Um olhar mais claro
-                  <br className="mobile-break" /> sobre as rodovias.
-                </h1>
-                <p>Explore os dados. Conecte os pontos. Encontre respostas.</p>
-              </div>
+              <h1>
+                Um olhar mais claro
+                <br className="mobile-break" /> sobre as rodovias.
+              </h1>
               <Button
                 variant="outline"
                 onClick={() => void initialize()}
@@ -682,33 +682,15 @@ export function Workspace() {
                 </motion.div>
               )}
             </AnimatePresence>
-            {partialCoverage && (
-              <div className="coverage-banner coverage-partial" role="status">
-                <AlertTriangle size={14} />
-                Cobertura parcial no período: resultados descrevem os registros disponíveis.
-                Consulte as fontes.
-              </div>
-            )}
-            {catalog?.warnings.slice(0, partialCoverage ? 1 : 2).map((warning) => (
-              <div className="coverage-banner" key={warning}>
-                <InfoIcon />
-                {warning}
-              </div>
-            ))}
             <div className="section-label">
               <span>
                 VISÃO GERAL <i>{widgets.length} visualizações</i>
               </span>
-              <span>
-                {pinnedCount > 0 &&
-                  `${pinnedCount} ${pinnedCount === 1 ? "resultado fixado" : "resultados fixados"}`}
-                <span className="live-dot" />
-                {busy
-                  ? "Atualizando análise"
-                  : catalog?.available
-                    ? "Exploração ao vivo"
-                    : "Aguardando dados"}
-              </span>
+              {pinnedCount > 0 && (
+                <span className="pinned-count">
+                  {`${pinnedCount} ${pinnedCount === 1 ? "resultado fixado" : "resultados fixados"}`}
+                </span>
+              )}
             </div>
             <div ref={containerRef} className="dashboard-grid">
               {loading && !widgets.length ? (
@@ -789,18 +771,56 @@ export function Workspace() {
                 </div>
               )}
             </div>
-            <footer className="dashboard-bottom">
-              <span>
-                <Database size={12} />
-                {synthetic
-                  ? "Demonstração · dados sintéticos"
-                  : "Fonte: ANTT · Rodovias federais concedidas"}
-              </span>
-              <span>Investigue com contexto. Decida com evidências.</span>
-            </footer>
           </main>
           {showChat && (
-            <div className={`chat-container mobile-${mobileTab}`}>
+            <div id="investigation-panel" className={`chat-container mobile-${activeMobileTab}`}>
+              <div
+                className="chat-resize-handle"
+                role="separator"
+                tabIndex={0}
+                aria-label="Largura do painel de investigação"
+                aria-controls="investigation-panel"
+                aria-orientation="vertical"
+                aria-valuemin={MIN_CHAT_WIDTH}
+                aria-valuemax={maxChatWidth}
+                aria-valuenow={chatWidth}
+                aria-valuetext={`${chatWidth} pixels`}
+                onPointerDown={(event) => {
+                  if (!event.isPrimary || event.button !== 0) return;
+                  event.preventDefault();
+                  event.currentTarget.focus({ preventScroll: true });
+                  event.currentTarget.setPointerCapture(event.pointerId);
+                  chatDrag.current = {
+                    pointerId: event.pointerId,
+                    x: event.clientX,
+                    width: chatWidth,
+                  };
+                  setResizingChat(true);
+                }}
+                onPointerMove={(event) => {
+                  const drag = chatDrag.current;
+                  if (drag?.pointerId !== event.pointerId) return;
+                  setPreferredChatWidth(clampChatWidth(drag.width + drag.x - event.clientX));
+                }}
+                onLostPointerCapture={(event) => {
+                  if (chatDrag.current?.pointerId !== event.pointerId) return;
+                  chatDrag.current = null;
+                  setResizingChat(false);
+                }}
+                onKeyDown={(event) => {
+                  const step = event.shiftKey ? 64 : 16;
+                  const widths: Record<string, number> = {
+                    ArrowLeft: chatWidth + step,
+                    ArrowRight: chatWidth - step,
+                    Home: MIN_CHAT_WIDTH,
+                    End: maxChatWidth,
+                  };
+                  const nextWidth = widths[event.key];
+                  if (typeof nextWidth !== "number") return;
+                  event.preventDefault();
+                  setPreferredChatWidth(clampChatWidth(nextWidth));
+                }}
+              />
               <InvestigationChat
                 messages={view?.session.messages ?? []}
                 stages={stages}
@@ -809,21 +829,20 @@ export function Workspace() {
                 suggestions={suggestions}
                 onSubmit={(message) => void send(message)}
                 onCancel={() => abort.current?.abort()}
-                onNew={() => void newSession()}
               />
             </div>
           )}
         </div>
         <div className="mobile-tabs">
           <button
-            className={mobileTab === "dashboard" ? "active" : ""}
+            className={activeMobileTab === "dashboard" ? "active" : ""}
             onClick={() => setMobileTab("dashboard")}
           >
             <LayoutDashboard size={17} />
             Painel
           </button>
           <button
-            className={mobileTab === "chat" ? "active" : ""}
+            className={activeMobileTab === "chat" ? "active" : ""}
             onClick={() => {
               setMobileTab("chat");
               setShowChat(true);
@@ -836,7 +855,4 @@ export function Workspace() {
       </div>
     </MotionConfig>
   );
-}
-function InfoIcon() {
-  return <ArrowDownToLine size={13} />;
 }
