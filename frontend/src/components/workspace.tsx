@@ -539,14 +539,12 @@ export function Workspace() {
             <div className="mobile-theme">
               <ThemeToggle />
             </div>
-            <span className="source-pill">
-              <i />
-              {catalog?.available
-                ? synthetic
-                  ? "Demonstração · dados sintéticos"
-                  : "Dados ANTT"
-                : "Base não importada"}
-            </span>
+            {(!catalog?.available || synthetic) && (
+              <span className="source-pill">
+                <i />
+                {catalog?.available ? "Demonstração · dados sintéticos" : "Base não importada"}
+              </span>
+            )}
             <Button
               variant="ghost"
               size="icon"
@@ -560,17 +558,10 @@ export function Workspace() {
         <div className="workspace-body">
           <main className={`dashboard-main mobile-${mobileTab}`}>
             <div className="page-heading">
-              <div>
-                <div className="eyebrow">
-                  <span className="tiny-line" />
-                  OBSERVATÓRIO DE SEGURANÇA
-                </div>
-                <h1>
-                  Um olhar mais claro
-                  <br className="mobile-break" /> sobre as rodovias.
-                </h1>
-                <p>Explore os dados. Conecte os pontos. Encontre respostas.</p>
-              </div>
+              <h1>
+                Um olhar mais claro
+                <br className="mobile-break" /> sobre as rodovias.
+              </h1>
               <Button
                 variant="outline"
                 onClick={() => void initialize()}

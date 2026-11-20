@@ -296,22 +296,12 @@ button {
   align-items: center;
   gap: 7px;
 }
-.tiny-line {
-  height: 1px;
-  width: 15px;
-  background: var(--accent);
-}
 .page-heading h1 {
   font-weight: 550;
   font-size: 29px;
   letter-spacing: -1.1px;
-  margin: 12px 0 9px;
-  line-height: 1.23;
-}
-.page-heading p {
-  color: var(--muted);
-  font-size: 12px;
   margin: 0;
+  line-height: 1.23;
 }
 .mobile-break {
   display: none;
@@ -1318,19 +1308,11 @@ select.filter-control {
   .page-heading h1 {
     font-size: 25px;
     line-height: 1.25;
-    margin-top: 13px;
-  }
-  .page-heading p {
-    font-size: 11px;
-    line-height: 1.65;
-    max-width: 240px;
   }
   .page-heading {
-    align-items: flex-start;
     margin-bottom: 23px;
   }
   .page-heading > .button {
-    margin-top: 24px;
     padding: 0;
     width: 32px;
   }
