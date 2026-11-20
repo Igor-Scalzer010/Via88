@@ -82,7 +82,8 @@ textarea:focus-visible {
 button {
   color: inherit;
 }
-.sr-only {
+.sr-only,
+.sb-echarts[data-ready="true"] > .fallback {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -492,6 +493,41 @@ button {
   flex: 1;
   min-height: 0;
   padding: 0 14px;
+}
+.sb-echarts {
+  --_text: var(--sb-text, var(--foreground));
+  --_strong: var(--sb-text-strong, var(--foreground));
+  --_muted: var(--sb-text-2, var(--muted));
+  --_line: var(--sb-line, var(--border));
+  --_grid: var(--sb-grid, var(--border));
+  --_tip: var(--sb-surface, var(--card));
+  --_c1: var(--sb-chart-1, var(--chart-1));
+  --_c2: var(--sb-chart-2, var(--chart-2));
+  --_c3: var(--sb-chart-3, var(--chart-3));
+  --_c4: var(--sb-chart-4, var(--chart-4));
+  --_c5: var(--sb-chart-5, var(--chart-5));
+  --_c6: var(--sb-chart-6, var(--chart-6));
+  --_c7: var(--sb-chart-7, var(--accent));
+  --_c8: var(--sb-chart-8, var(--subtle));
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.sb-echarts > .plot {
+  position: absolute;
+  inset: 0;
+}
+.sb-echarts[data-ready="false"] > .plot {
+  visibility: hidden;
+}
+.sb-echarts > .plot:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  border-radius: 8px;
+}
+.sb-echarts[data-ready="false"] > .fallback {
+  height: 100%;
+  overflow: auto;
 }
 .widget-footer {
   display: flex;

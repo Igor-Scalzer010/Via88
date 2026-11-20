@@ -1,6 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -13,9 +13,6 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
 } from "recharts";
 import {
   AlertTriangle,
@@ -30,20 +27,13 @@ import {
 import type { Dataset, Widget } from "@/lib/contracts.generated";
 import { formatDate, number } from "@/lib/utils";
 import { DataTable } from "./data-table";
+import { DonutChart } from "./donut-chart";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 const GeoMap = dynamic(() => import("./geo-map"), {
   ssr: false,
   loading: () => <div className="chart-skeleton" />,
 });
-const colors = [
-  "var(--chart-1)",
-  "var(--chart-2)",
-  "var(--chart-3)",
-  "var(--chart-4)",
-  "var(--chart-5)",
-  "var(--chart-6)",
-];
 export function Sources({ dataset }: { dataset: Dataset }) {
   const evidence = dataset.evidence;
   return (
@@ -136,13 +126,14 @@ export function WidgetCard({
           (widget.aggregation === "avg" ? values.length : 1)
         : null
     : null;
-  const data = [...dataset.rows];
-  if ("sort" in widget && widget.sort)
-    data.sort(
+  const data = useMemo(() => {
+    if (!("sort" in widget) || !widget.sort) return dataset.rows;
+    return [...dataset.rows].sort(
       (a, b) =>
         (Number(a[widget.y_field]) - Number(b[widget.y_field])) *
         (widget.sort === "descending" ? -1 : 1),
     );
+  }, [dataset.rows, widget]);
   const tooltip = {
     contentStyle: {
       borderRadius: 12,
@@ -231,24 +222,13 @@ export function WidgetCard({
                 onSelect={selectUF}
               />
             ) : widget.type === "donut_chart" ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={data}
-                    dataKey={widget.y_field}
-                    nameKey={widget.x_field}
-                    innerRadius="57%"
-                    outerRadius="82%"
-                    paddingAngle={3}
-                    stroke="none"
-                  >
-                    {data.map((_, i) => (
-                      <Cell key={i} fill={colors[i % colors.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip {...tooltip} />
-                </PieChart>
-              </ResponsiveContainer>
+              <DonutChart
+                data={data}
+                labelField={widget.x_field}
+                valueField={widget.y_field}
+                valueLabel={seriesLabel}
+                title={widget.title}
+              />
             ) : widget.type === "bar_chart" ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
