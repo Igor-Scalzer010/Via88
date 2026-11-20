@@ -1043,43 +1043,51 @@ button {
   font-size: 11px;
   line-height: 1.6;
 }
-.filters-form > p {
+.filter-label {
   font-size: 12px;
-  line-height: 1.7;
+  font-weight: 600;
 }
-.filters-form label {
+.filter-control {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 11px;
-  margin-bottom: 15px;
-  color: var(--muted);
-}
-.filters-form input,
-.filters-form select {
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
   border: 1px solid var(--border);
   background: var(--background);
   color: var(--foreground);
-  border-radius: 7px;
-  padding: 9px;
-  width: 100%;
+  border-radius: 9px;
+  padding-block: 8px;
+  padding-inline: 11px;
   font-size: 12px;
+  text-align: start;
+  transition:
+    border-color 0.15s,
+    background-color 0.15s;
 }
-.filters-form select[multiple] {
-  min-height: 70px;
-  max-height: 95px;
+select.filter-control {
+  padding-inline-end: 34px;
 }
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
+.filter-control:hover:not(:disabled),
+.filter-control[data-state="open"] {
+  border-color: color-mix(in srgb, var(--accent) 65%, var(--border));
 }
-.form-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-top: 1px solid var(--border);
-  padding-top: 16px;
+.filter-control[data-state="open"] {
+  background: var(--accent-light);
+}
+.popover-content[data-state="open"] {
+  animation: popover-enter 0.16s ease-out;
+}
+@keyframes popover-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 .error-text {
   color: #c3685b;

@@ -3,7 +3,15 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 export const Dialog = DialogPrimitive.Root;
 export const DialogTrigger = DialogPrimitive.Trigger;
-export function DialogContent({ title, children }: { title: string; children: React.ReactNode }) {
+export function DialogContent({
+  title,
+  description = "Detalhes e evidências da análise selecionada.",
+  children,
+}: {
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+}) {
   return (
     <DialogPrimitive.Portal>
       <DialogPrimitive.Overlay className="dialog-overlay" />
@@ -14,9 +22,7 @@ export function DialogContent({ title, children }: { title: string; children: Re
             <X size={18} />
           </DialogPrimitive.Close>
         </div>
-        <DialogPrimitive.Description className="sr-only">
-          Detalhes e evidências da análise selecionada.
-        </DialogPrimitive.Description>
+        <DialogPrimitive.Description className="sr-only">{description}</DialogPrimitive.Description>
         {children}
       </DialogPrimitive.Content>
     </DialogPrimitive.Portal>
