@@ -10,19 +10,21 @@ export function DonutChart({
   valueField,
   valueLabel,
   title,
+  formatLabel,
 }: {
   data: Dataset["rows"];
   labelField: string;
   valueField: string;
   valueLabel: string;
   title: string;
+  formatLabel?: (label: string) => string;
 }) {
   const { slices, option } = useMemo(() => {
     const slices = data.flatMap((row) => {
       const value = row[valueField];
       if (typeof value !== "number" || !Number.isFinite(value) || value < 0) return [];
-      const name = String(row[labelField] ?? "Sem classificação");
-      return [{ id: String(row.key ?? name), name, value }];
+      const label = String(row[labelField] ?? "Sem classificação");
+      return [{ id: String(row.key ?? label), name: formatLabel?.(label) ?? label, value }];
     });
     const option: EChartsOption | null = slices.some(({ value }) => value > 0)
       ? {
@@ -45,7 +47,7 @@ export function DonutChart({
         }
       : null;
     return { slices, option };
-  }, [data, labelField, valueField, valueLabel]);
+  }, [data, labelField, valueField, valueLabel, formatLabel]);
 
   return (
     <EChart option={option}>

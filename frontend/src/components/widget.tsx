@@ -14,18 +14,9 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import {
-  AlertTriangle,
-  Check,
-  ExternalLink,
-  GripVertical,
-  Info,
-  Pin,
-  Table2,
-  Trash2,
-} from "lucide-react";
+import { ExternalLink, GripVertical, Info, Pin, Table2, Trash2 } from "lucide-react";
 import type { Dataset, Widget } from "@/lib/contracts.generated";
-import { formatDate, number } from "@/lib/utils";
+import { formatDate, formatMonth, number } from "@/lib/utils";
 import { DataTable } from "./data-table";
 import { DonutChart } from "./donut-chart";
 import { Button } from "./ui/button";
@@ -34,12 +25,23 @@ const GeoMap = dynamic(() => import("./geo-map"), {
   ssr: false,
   loading: () => <div className="chart-skeleton" />,
 });
+
+function formatWidgetText(text: string): string {
+  return text
+    .replace(
+      /\bPeríodo \[(\d{4}-\d{2}-\d{2}), (\d{4}-\d{2}-\d{2})\)/g,
+      (_, start: string, end: string) =>
+        `Período de ${formatDate(start)} a ${formatDate(end)} (fim exclusivo)`,
+    )
+    .replace(/\b\d{4}-\d{2}-\d{2}\b/g, (date) => formatDate(date));
+}
+
 export function Sources({ dataset }: { dataset: Dataset }) {
   const evidence = dataset.evidence;
   return (
     <div className="sources">
       <span className="eyebrow">EVIDÊNCIA DA ANÁLISE</span>
-      <h3>{dataset.title}</h3>
+      <h3>{formatWidgetText(dataset.title)}</h3>
       <dl>
         <div>
           <dt>Fonte</dt>
@@ -57,7 +59,7 @@ export function Sources({ dataset }: { dataset: Dataset }) {
         </div>
         <div>
           <dt>Definição</dt>
-          <dd>{evidence.definition}</dd>
+          <dd>{formatWidgetText(evidence.definition)}</dd>
         </div>
         <div>
           <dt>Registros encontrados</dt>
@@ -78,7 +80,7 @@ export function Sources({ dataset }: { dataset: Dataset }) {
       <pre>{JSON.stringify(dataset.query, null, 2)}</pre>
       {evidence.warnings.map((warning) => (
         <p className="notice" key={warning}>
-          {warning}
+          {formatWidgetText(warning)}
         </p>
       ))}
       <p className="muted">
@@ -108,8 +110,10 @@ export function WidgetCard({
   const [table, setTable] = useState(false);
   const selectUF = useCallback((uf: string) => onFilter("uf", uf), [onFilter]);
   const metric = widget.type === "metric";
-  const partialCoverage = dataset.evidence.coverage === "partial";
-  const sourceLabel = /sint[eé]tic/i.test(dataset.evidence.source) ? "Demonstração" : "Dados ANTT";
+  const title = formatWidgetText(widget.title);
+  const description = formatWidgetText(widget.description || dataset.evidence.definition);
+  const synthetic = /sint[eé]tic/i.test(dataset.evidence.source);
+  const formatCategory = dataset.query.group_by === "month" ? formatMonth : undefined;
   const seriesField = "y_field" in widget ? widget.y_field : "value";
   const seriesLabel =
     dataset.columns.find((column) => column.key === seriesField)?.label ?? dataset.title;
@@ -142,6 +146,7 @@ export function WidgetCard({
       fontSize: 12,
     },
     formatter: (value: unknown) => number.format(Number(value)),
+    labelFormatter: formatCategory,
   };
   return (
     <article
@@ -151,12 +156,12 @@ export function WidgetCard({
       <header className="widget-header">
         <div className="widget-title">
           {!locked && <GripVertical size={15} className="drag-handle" aria-hidden="true" />}
-          <h2>{widget.title}</h2>
+          <h2>{title}</h2>
         </div>
         <div className="widget-actions">
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label={`Ver fontes: ${widget.title}`}>
+              <Button variant="ghost" size="icon" aria-label={`Ver fontes: ${title}`}>
                 <Info size={14} />
               </Button>
             </DialogTrigger>
@@ -178,18 +183,13 @@ export function WidgetCard({
           <Button
             variant="ghost"
             size="icon"
-            aria-label={pinned ? `Desafixar ${widget.title}` : `Fixar resultado ${widget.title}`}
+            aria-label={pinned ? `Desafixar ${title}` : `Fixar resultado ${title}`}
             onClick={onPin}
             aria-pressed={pinned}
           >
             <Pin size={14} className={pinned ? "pinned-icon" : ""} />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onRemove}
-            aria-label={`Remover ${widget.title}`}
-          >
+          <Button variant="ghost" size="icon" onClick={onRemove} aria-label={`Remover ${title}`}>
             <Trash2 size={14} />
           </Button>
         </div>
@@ -197,16 +197,18 @@ export function WidgetCard({
       {metric ? (
         <div className="metric-body">
           <strong>{value === null ? "Sem informação" : number.format(value)}</strong>
-          <p>{widget.description || dataset.evidence.definition}</p>
-          <span className={`metric-footer ${partialCoverage ? "coverage-partial" : ""}`}>
-            {partialCoverage ? <AlertTriangle size={12} /> : <Check size={12} />}
-            {partialCoverage ? "Cobertura parcial" : sourceLabel}
-            {pinned ? " · Fixado" : ""}
-          </span>
+          <p>{description}</p>
+          {(synthetic || pinned) && (
+            <span className="metric-footer">
+              {synthetic && "Demonstração"}
+              {synthetic && pinned && " · "}
+              {pinned && "Fixado"}
+            </span>
+          )}
         </div>
       ) : (
         <>
-          <p className="widget-description">{widget.description || dataset.evidence.definition}</p>
+          <p className="widget-description">{description}</p>
           <div className="widget-visual">
             {table || widget.type === "table" ? (
               <DataTable
@@ -227,7 +229,8 @@ export function WidgetCard({
                 labelField={widget.x_field}
                 valueField={widget.y_field}
                 valueLabel={seriesLabel}
-                title={widget.title}
+                title={title}
+                formatLabel={formatCategory}
               />
             ) : widget.type === "bar_chart" ? (
               <ResponsiveContainer width="100%" height="100%">
@@ -248,6 +251,7 @@ export function WidgetCard({
                     type="category"
                     dataKey={widget.x_field}
                     width={105}
+                    tickFormatter={formatCategory}
                     axisLine={false}
                     tickLine={false}
                     tick={{ fill: "var(--muted)", fontSize: 11 }}
@@ -281,6 +285,7 @@ export function WidgetCard({
                     <XAxis
                       dataKey={widget.x_field}
                       minTickGap={30}
+                      tickFormatter={formatCategory}
                       axisLine={false}
                       tickLine={false}
                       tick={{ fill: "var(--muted)", fontSize: 11 }}
@@ -307,6 +312,7 @@ export function WidgetCard({
                     <XAxis
                       dataKey={widget.x_field}
                       minTickGap={30}
+                      tickFormatter={formatCategory}
                       axisLine={false}
                       tickLine={false}
                       tick={{ fill: "var(--muted)", fontSize: 11 }}
@@ -336,15 +342,7 @@ export function WidgetCard({
             <span>
               {formatDate(dataset.evidence.start_date)} — {formatDate(dataset.evidence.end_date)}*
             </span>
-            <span className="footer-badges">
-              {partialCoverage && (
-                <span className="coverage-partial">
-                  <AlertTriangle size={10} />
-                  Cobertura parcial
-                </span>
-              )}
-              <span>{pinned ? "Fixado · " : ""}* fim exclusivo</span>
-            </span>
+            <span>{pinned ? "Fixado · " : ""}* fim exclusivo</span>
           </footer>
         </>
       )}

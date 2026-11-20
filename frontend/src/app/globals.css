@@ -411,24 +411,6 @@ button {
   width: 100%;
   height: 100%;
 }
-.coverage-partial,
-.metric-footer.coverage-partial {
-  color: #926b26;
-}
-.dark .coverage-partial {
-  color: #dfbc77;
-}
-.footer-badges {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
-}
-.footer-badges .coverage-partial {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
 .widget-card.is-pinned {
   border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
 }
@@ -571,9 +553,6 @@ button {
 }
 .metric-footer {
   margin-top: auto;
-  display: flex;
-  align-items: center;
-  gap: 5px;
   color: var(--accent);
   font-size: 9px;
 }
