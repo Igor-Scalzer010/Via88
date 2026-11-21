@@ -11,7 +11,7 @@ import {
 import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight, Download } from "lucide-react";
 import { DatasetSchema, type Dataset } from "@/lib/contracts.generated";
 import { api } from "@/lib/api";
-import { number } from "@/lib/utils";
+import { formatDate, formatMonth, number } from "@/lib/utils";
 import { Button } from "./ui/button";
 export function DataTable({ dataset, fields }: { dataset: Dataset; fields?: string[] }) {
   "use no memo"; // TanStack Table owns mutable getters; exclude it from React Compiler.
@@ -22,6 +22,7 @@ export function DataTable({ dataset, fields }: { dataset: Dataset; fields?: stri
   const [loading, setLoading] = useState(false);
   const pageSize = 10;
   const serverMode = dataset.row_count > dataset.rows.length || dataset.rows.length > pageSize;
+  const monthly = dataset.query.group_by === "month";
   useEffect(() => {
     if (!serverMode) return;
     const controller = new AbortController();
@@ -58,12 +59,17 @@ export function DataTable({ dataset, fields }: { dataset: Dataset; fields?: stri
           header: column.label,
           cell: ({ getValue }) => {
             const value: unknown = getValue();
+            if (typeof value === "string") {
+              if (column.data_type === "date") return formatDate(value);
+              if (monthly && (column.key === "key" || column.key === "label"))
+                return formatMonth(value);
+            }
             return typeof value === "number"
               ? `${number.format(value)}${column.format === "percent" ? "%" : ""}`
               : String(value ?? "—");
           },
         })),
-    [dataset.columns, fields],
+    [dataset.columns, fields, monthly],
   );
   // eslint-disable-next-line react-hooks/incompatible-library -- Mutable getters stay inside this component, which opts out of React Compiler.
   const table = useReactTable({

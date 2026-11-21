@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { expect, it, vi } from "vitest";
 import { WidgetCard } from "../../src/components/widget";
 import { dataset, result } from "../fixtures";
-it("makes partial coverage visible in metrics and table footers", () => {
+it("localizes saved widget dates and omits partial coverage badges", () => {
   const action = result.dashboard_actions[0];
   if (action.action === "remove") throw new Error("fixture");
   const partial = { ...dataset, evidence: { ...dataset.evidence, coverage: "partial" as const } };
@@ -14,23 +14,36 @@ it("makes partial coverage visible in metrics and table footers", () => {
     onRemove: vi.fn(),
     onFilter: vi.fn(),
   };
-  const { rerender } = render(<WidgetCard {...props} widget={action.widget} />);
-  expect(screen.getByText("Cobertura parcial")).toBeInTheDocument();
+  const description = "Contagem de acidentes. Período [2023-01-01, 2026-01-01).";
+  const localized = "Contagem de acidentes. Período de 01/01/2023 a 01/01/2026 (fim exclusivo).";
+  const { rerender } = render(<WidgetCard {...props} widget={{ ...action.widget, description }} />);
+  expect(screen.getByText(localized)).toBeInTheDocument();
+  expect(screen.queryByText("Cobertura parcial")).not.toBeInTheDocument();
   expect(screen.queryByText("Dados ANTT")).not.toBeInTheDocument();
   rerender(
     <WidgetCard
       {...props}
+      dataset={{
+        ...partial,
+        columns: [
+          ...partial.columns,
+          { key: "data", label: "Data", data_type: "date", format: "text" },
+        ],
+        rows: partial.rows.map((row) => ({ ...row, data: "2025-12-31" })),
+      }}
       widget={{
         type: "table",
         id: "table_partial",
         title: "Tabela parcial",
         dataset_id: dataset.id,
-        description: "",
+        description,
         columns: [],
       }}
     />,
   );
-  expect(screen.getByText("Cobertura parcial")).toBeInTheDocument();
+  expect(screen.getByText(localized)).toBeInTheDocument();
+  expect(screen.getAllByText("31/12/2025")).toHaveLength(2);
+  expect(screen.queryByText("Cobertura parcial")).not.toBeInTheDocument();
   expect(screen.getByText("* fim exclusivo")).toBeInTheDocument();
 });
 it("renders metrics from query results and exposes source evidence", () => {
